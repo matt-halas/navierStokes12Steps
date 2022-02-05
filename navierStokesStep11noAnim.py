@@ -1,7 +1,5 @@
 # %%
-
 import numpy as np
-import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
 def momentum(u, v, p, dt, dx, dy, nu, rho):
@@ -72,46 +70,20 @@ p = np.zeros((ny, nx))
 u = np.zeros((ny, nx))
 v = np.zeros((ny, nx))
 
-n_time_steps = 100
-n_pres_iterations = 50
-
-n_record = 10
-record_interval = n_time_steps // n_record
-
-p_all = np.zeros((n_record, ny, nx))
-u_all = np.zeros((n_record, ny, nx))
-v_all = np.zeros((n_record, ny, nx))
-record_idx = 0
+n_time_steps = 20
+n_pres_iterations = 500
 
 for i in range(n_time_steps):
     p = pressure(u, v, p, dt, dx, dy, nu, rho, n_pres_iterations)
     u, v = momentum(u, v, p, dt, dx, dy, nu, rho)
-    
-    if record_interval != 0:
-        if i % record_interval == 0:
-            p_all[record_idx] = p
-            u_all[record_idx] = u
-            v_all[record_idx] = v
-            record_idx += 1
 
 # %%
-def plotVelocity(i):
-    if i >= len(p_all):
-        plt.close()
-    else:
-        plt.clf()
-        plt.xlim((0, 2))
-        plt.ylim((0, 2))
-        plt.xlabel('x')
-        plt.ylabel('y')
-        plt.grid()
-        plt.contourf(x_loc, y_loc, p_all[i], cmap='plasma',
-            levels=25, vmin=-0.5, vmax=0.5)
-        plt.streamplot(x_loc, y_loc, u_all[i], v_all[i], density=1)
-        plt.colorbar()
 
-
-if __name__ == '__main__':
-    fig = plt.figure()
-    animation_1 = animation.FuncAnimation(fig, plotVelocity, interval=200)
-    animation_1.save('lidFlow.gif')
+plt.figure()
+plt.contourf(x_loc, y_loc, p, cmap='plasma')
+plt.title(f"Pressure dist at {n_time_steps * dt} seconds")
+plt.colorbar()
+plt.streamplot(x_loc, y_loc, u, v, density=1)
+plt.xlim(0, 2)
+plt.ylim(0, 2)
+# %%
